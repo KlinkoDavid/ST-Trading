@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="hu" class="scroll-smooth">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Stranger Trading — Kártyacsere</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Creepster&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-content">
+      <div class="logo">
+        <span class="logo-text">STRANGER</span>
+        <small class="logo-sub">Trading</small>
+      </div>
+      <div class="nav-links">
+        <a href="#hero">Főoldal</a>
+        <a href="#about">Rólunk</a>
+        <a href="#cards">Kártyák</a>
+      </div>
+    </div>
+  </nav>
+
+  <section id="hero" class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-content">
+      <h1 class="hero-title fade-in">
+        <span class="glitch" data-text="STRANGER TRADING">STRANGER TRADING</span>
+      </h1>
+      <p class="hero-subtitle fade-in-delay">A kártyagyűjtők biztonságos csereterülete</p>
+      <div class="hero-image fade-in-delay-2">
+        <img src="img/Megapack.webp" alt="Stranger Things Cards" />
+      </div>
+      <a href="#about" class="cta-btn fade-in-delay-3">Fedezd fel</a>
+    </div>
+    <div class="scroll-indicator">
+      <div class="mouse"></div>
+    </div>
+  </section>
+
+  <section id="about" class="section-about">
+    <div class="container">
+      <h2 class="section-title reveal">Miért mi?</h2>
+      <div class="features">
+        <div class="feature-card reveal">
+          <div class="feature-icon">🎴</div>
+          <h3>Biztonságos csere</h3>
+          <p>Csak ellenőrzött gyűjtőkkel cseréj, visszajelzési rendszerrel és moderált közösséggel.</p>
+        </div>
+        <div class="feature-card reveal">
+          <div class="feature-icon">🔍</div>
+          <h3>Könnyű keresés</h3>
+          <p>Szűrj sorozat, karakter vagy ritkaság szerint — azonnal megtalálod, amire vágysz.</p>
+        </div>
+        <div class="feature-card reveal">
+          <div class="feature-icon">💬</div>
+          <h3>Valós idejű chat</h3>
+          <p>Beszélj a tulajdonosokkal közvetlenül, alkudj és dobd össze a tökéletes cserét.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="cards" class="section-cards">
+    <div class="container">
+      <h2 class="section-title reveal">Elérhető kártyák</h2>
+      <div class="search-bar reveal">
+        <input id="search" type="search" placeholder="🔎 Keresés: név, sorozat, tulajdonos..." />
+      </div>
+      <div id="cardsGrid" class="cards-grid" aria-live="polite">
+        <!-- Cards rendered by JS -->
+      </div>
+    </div>
+  </section>
+
+  <div id="tradeModal" class="modal" aria-hidden="true">
+    <div class="modal-content">
+      <button class="close-btn" id="modalClose">×</button>
+      <h2>Kérés elküldése</h2>
+      <div id="modalCardInfo"></div>
+      <form id="tradeForm">
+        <label for="yourCard">Te tulajdonában lévő kártya (opcionális)</label>
+        <input type="text" id="yourCard" placeholder="Pl. Eleven — Season 3" />
+        
+        <label for="message">Üzenet a tulajdonosnak</label>
+        <textarea id="message" rows="4" placeholder="Szia! Érdekelne a kártyád..."></textarea>
+        <div class="modal-actions">
+          <button type="submit" class="btn primary">Kérés küldése</button>
+          <button type="button" class="btn" id="modalCancel">Mégse</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="logo">
+          <span class="logo-text">STRANGER</span>
+          <small class="logo-sub">Trading</small>
+        </div>
+        <p>Demo — nem valós szolgáltatás. Fejlesztés alatt: bejelentkezés és valós idejű üzenetküldés.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
