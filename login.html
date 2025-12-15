@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="hu">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Stranger Trading — Belépés</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/auth.css">
+</head>
+<body>
+  
+  <div class="auth-container fade-in">
+    <div class="logo center-logo">
+        <span class="logo-text">STRANGER</span>
+        <small class="logo-sub">Trading</small>
+    </div>
+
+    <div class="auth-toggle">
+      <button id="showLogin" class="active">Bejelentkezés</button>
+      <button id="showRegister">Regisztráció</button>
+    </div>
+
+    <form id="loginForm" class="auth-form active">
+      <h2>Üdv újra a túloldalon!</h2>
+      <div class="input-group">
+        <label>Felhasználónév</label>
+        <input type="text" id="loginUser" required placeholder="Írd be a neved...">
+      </div>
+      <div class="input-group">
+        <label>Jelszó</label>
+        <input type="password" id="loginPass" required placeholder="******">
+      </div>
+      <button type="submit" class="btn primary full-width">Belépés</button>
+      <p class="back-link"><a href="index.html">← Vissza a főoldalra</a></p>
+    </form>
+
+    <form id="registerForm" class="auth-form">
+      <h2>Csatlakozz a klubhoz!</h2>
+      <div class="input-group">
+        <label>Válassz felhasználónevet</label>
+        <input type="text" id="regUser" required placeholder="Pl. MadMax">
+      </div>
+      <div class="input-group">
+        <label>Jelszó</label>
+        <input type="password" id="regPass" required placeholder="******">
+      </div>
+      <button type="submit" class="btn primary full-width">Regisztráció</button>
+      <p class="back-link"><a href="index.html">← Vissza a főoldalra</a></p>
+    </form>
+  </div>
+
+  <script src="js/auth.js"></script>
+</body>
+</html>

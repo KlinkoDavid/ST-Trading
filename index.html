@@ -15,11 +15,9 @@
         <span class="logo-text">STRANGER</span>
         <small class="logo-sub">Trading</small>
       </div>
-      <div class="nav-links">
-        <a href="#hero">Főoldal</a>
+      <div class="nav-links" id="navLinks"> <a href="#hero">Főoldal</a>
         <a href="#about">Rólunk</a>
-        <a href="#cards">Kártyák</a>
-      </div>
+        <a href="login.html" id="authLink">Bejelentkezés</a> </div>
     </div>
   </nav>
 
@@ -31,18 +29,15 @@
       </h1>
       <p class="hero-subtitle fade-in-delay">A kártyagyűjtők biztonságos csereterülete</p>
       <div class="hero-image fade-in-delay-2">
-        <img src="img/Megapack.webp" alt="Stranger Things Cards" />
+        <img src="img/collectoralbum.png" alt="Stranger Things Cards" />
       </div>
       <a href="#about" class="cta-btn fade-in-delay-3">Fedezd fel</a>
-    </div>
-    <div class="scroll-indicator">
-      <div class="mouse"></div>
     </div>
   </section>
 
   <section id="about" class="section-about">
     <div class="container">
-      <h2 class="section-title reveal">Miért mi?</h2>
+      <h2 class="section-title reveal" data-text="Miért mi?">Miért mi?</h2>
       <div class="features">
         <div class="feature-card reveal">
           <div class="feature-icon">🎴</div>
@@ -63,15 +58,14 @@
     </div>
   </section>
 
-  <section id="cards" class="section-cards">
+  <section id="cards" class="section-cards hidden"> 
     <div class="container">
-      <h2 class="section-title reveal">Elérhető kártyák</h2>
+      <h2 class="section-title reveal" data-text="Elérhető kártyák">Elérhető kártyák</h2>
       <div class="search-bar reveal">
         <input id="search" type="search" placeholder="🔎 Keresés: név, sorozat, tulajdonos..." />
       </div>
       <div id="cardsGrid" class="cards-grid" aria-live="polite">
-        <!-- Cards rendered by JS -->
-      </div>
+        </div>
     </div>
   </section>
 

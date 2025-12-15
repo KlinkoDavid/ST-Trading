@@ -17,7 +17,79 @@ const tradeForm = document.getElementById('tradeForm');
 const modalClose = document.getElementById('modalClose');
 const modalCancel = document.getElementById('modalCancel');
 
+// ÚJ ELEMEK A FELDOLGOZÁSHOZ
+const cardsSection = document.getElementById('cards');
+const navLinksEl = document.getElementById('navLinks');
+const authLink = document.getElementById('authLink');
+
 let activeCard = null;
+
+// --- BEJELENTKEZÉS KEZELÉSE ---
+// Ezt a sessionStorge-ot egy igazi backend rendszernél session cookie vagy token helyettesítené
+const isLoggedIn = sessionStorage.getItem('isLoggedIn') === 'true'; 
+
+function updateUIForAuth() {
+    if (isLoggedIn) {
+        // Bejelentkezve: Kártyák megjelenítése
+        cardsSection.classList.remove('hidden');
+
+        // Navigáció frissítése: Hozzáadjuk a Kártyák linket, és Kijelentkezésre cseréljük a gombot
+        // Ellenőrizzük, hogy a Kártyák link nincs-e már ott
+        if (!document.querySelector('#navLinks a[href="#cards"]')) {
+            const cardsLink = document.createElement('a');
+            cardsLink.href = '#cards';
+            cardsLink.textContent = 'Kártyák';
+            
+            // Hozzáadjuk a Rólunk link után, a bejelentkezési link elé
+            const aboutLink = document.querySelector('#navLinks a[href="#about"]');
+            if (aboutLink) {
+                navLinksEl.insertBefore(cardsLink, authLink);
+            } else {
+                 navLinksEl.insertBefore(cardsLink, authLink);
+            }
+        }
+        
+        authLink.textContent = 'Kijelentkezés';
+        authLink.href = '#';
+        // Eltávolítjuk a bejelentkezés oldali átirányítást (ha volt) és hozzáadjuk a kijelentkezést
+        authLink.removeEventListener('click', redirectToLogin); 
+        authLink.addEventListener('click', logout); 
+        
+        // Rendereljük a kártyákat
+        renderCards(cards);
+    } else {
+        // Nincs bejelentkezve: Kártyák elrejtése
+        cardsSection.classList.add('hidden');
+        
+        // Kártyák link eltávolítása (ha létezik)
+        const existingCardsLink = document.querySelector('#navLinks a[href="#cards"]');
+        if (existingCardsLink) {
+            existingCardsLink.remove();
+        }
+
+        // Visszaállítjuk a Bejelentkezés linket
+        authLink.textContent = 'Bejelentkezés';
+        authLink.href = 'login.html';
+        authLink.removeEventListener('click', logout); 
+    }
+}
+
+function redirectToLogin(e) {
+    // Ezt a funkciót csak azért kell, hogy ne ugorjon fel az 'undefined' hiba, 
+    // mivel az index.html már tartalmazza a login.html linket
+}
+
+function logout(e) {
+    e.preventDefault();
+    sessionStorage.removeItem('isLoggedIn');
+    alert('Sikeresen kijelentkeztél. Visszairányítás a főoldalra.');
+    window.location.href = 'index.html'; // Oldal frissítése az állapotváltozás miatt
+}
+
+// Futás a DOM betöltése után
+document.addEventListener('DOMContentLoaded', updateUIForAuth);
+// -----------------------------
+
 
 // Scroll reveal animation
 const revealElements = document.querySelectorAll('.reveal');
@@ -31,8 +103,12 @@ const revealOnScroll = () => {
 window.addEventListener('scroll', revealOnScroll);
 window.addEventListener('load', revealOnScroll);
 
+
 function renderCards(list){
   cardsEl.innerHTML = '';
+  // Csak akkor renderelünk kártyákat, ha be van jelentkezve
+  if (!isLoggedIn) return; 
+  
   list.forEach(c=>{
     const el = document.createElement('article');
     el.className = 'card';
@@ -72,7 +148,7 @@ tradeForm.addEventListener('submit', function(evt){
   const yourCard = document.getElementById('yourCard').value.trim();
   const message = document.getElementById('message').value.trim();
   // Simulate sending: store locally in localStorage as demo
-  const requests = JSON.parse(localStorage.getItem('tradeRequests'||'[]'))||[];
+  const requests = JSON.parse(localStorage.getItem('tradeRequests')||'[]')||[];
   requests.push({to:activeCard.owner,card:activeCard.title,yourCard,message,when:new Date().toISOString()});
   localStorage.setItem('tradeRequests',JSON.stringify(requests));
   alert('Kérés elküldve (demo): a tulajdonos értesítése szimulálva.');
@@ -84,10 +160,12 @@ modalCancel.addEventListener('click', closeModal);
 
 searchEl.addEventListener('input', function(){
   const q = this.value.trim().toLowerCase();
+  
+  // Csak akkor keressünk, ha be van jelentkezve 
+  if(!isLoggedIn) return;
+
   if(!q) return renderCards(cards);
+  
   const filtered = cards.filter(c=> (c.title+ ' '+c.series+' '+c.owner).toLowerCase().includes(q));
   renderCards(filtered);
 });
-
-// initial
-renderCards(cards);
