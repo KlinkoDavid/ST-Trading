@@ -133,6 +133,25 @@ body {
   letter-spacing: 1px;
 }
 
+.timer-container {
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  margin-top: 15px;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+/* A tényleges piros csík, ami fogy */
+.timer-bar {
+  width: 100%;
+  height: 100%;
+  background: var(--accent);
+  box-shadow: 0 0 10px var(--accent);
+  /* Lineáris csökkenés */
+  transition: width 0.05s linear; 
+}
+
 /* Vissza link */
 .back-link {
   text-align: center;

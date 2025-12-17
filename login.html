@@ -1,20 +1,23 @@
 <!doctype html>
 <html lang="hu">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Stranger Trading — Belépés</title>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Inter:wght@300;400;600;800&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
   <link rel="stylesheet" href="css/auth.css">
 </head>
+
 <body>
-  
+
   <div class="auth-container fade-in">
     <div class="logo center-logo">
-        <span class="logo-text">STRANGER</span>
-        <small class="logo-sub">Trading</small>
+      <span class="logo-text">STRANGER</span>
+      <small class="logo-sub">Trading</small>
     </div>
 
     <div class="auth-toggle">
@@ -43,6 +46,10 @@
         <input type="text" id="regUser" required placeholder="Pl. MadMax">
       </div>
       <div class="input-group">
+        <label>E-mail cím</label>
+        <input type="email" id="regEmail" required placeholder="pelda@email.hu">
+      </div>
+      <div class="input-group">
         <label>Jelszó</label>
         <input type="password" id="regPass" required placeholder="******">
       </div>
@@ -53,4 +60,5 @@
 
   <script src="js/auth.js"></script>
 </body>
+
 </html>

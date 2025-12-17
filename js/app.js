@@ -1,171 +1,171 @@
 const cards = [
-  {id:1,title:'Eleven (Red Eyes)',series:'Series A',owner:'Zsófi',image:null},
-  {id:2,title:'Demogorgon Foil',series:'Series B',owner:'Bence',image:null},
-  {id:3,title:'Hopper — Special',series:'Series A',owner:'Anna',image:null},
-  {id:4,title:'Will Byers (Glow)',series:'Series C',owner:'Máté',image:null},
-  {id:5,title:'Max — Skate',series:'Series B',owner:'Dóra',image:null},
-  {id:6,title:'Dustin — Cap',series:'Series A',owner:'Gergő',image:null},
-  {id:7,title:'Lucas — Slingshot',series:'Series C',owner:'Lilla',image:null},
-  {id:8,title:'Mike — Walkie Talkie',series:'Series B',owner:'Áron',image:null}
+  { id: 1, title: 'Eleven (Red Eyes)', series: 'Series A', owner: 'Zsófi', image: 'img/6pack.png' },
+  { id: 2, title: 'Demogorgon Foil', series: 'Series B', owner: 'Bence', image: null },
+  { id: 3, title: 'Hopper — Special', series: 'Series A', owner: 'Anna', image: null },
+  { id: 4, title: 'Will Byers (Glow)', series: 'Series C', owner: 'Máté', image: null },
+  { id: 5, title: 'Max — Skate', series: 'Series B', owner: 'Dóra', image: null },
+  { id: 6, title: 'Dustin — Cap', series: 'Series A', owner: 'Gergő', image: null },
+  { id: 7, title: 'Lucas — Slingshot', series: 'Series C', owner: 'Lilla', image: null },
+  { id: 8, title: 'Mike — Walkie Talkie', series: 'Series B', owner: 'Áron', image: null }
 ];
 
-const cardsEl = document.getElementById('cardsGrid');
-const searchEl = document.getElementById('search');
-const modal = document.getElementById('tradeModal');
-const modalCardInfo = document.getElementById('modalCardInfo');
-const tradeForm = document.getElementById('tradeForm');
-const modalClose = document.getElementById('modalClose');
-const modalCancel = document.getElementById('modalCancel');
+let cardsEl, searchEl, modal, modalCardInfo, tradeForm, modalClose, modalCancel, authLink, activeCard;
+let viewModal, viewModalBody, viewModalClose, viewModalOk;
+let observer;
 
-// ÚJ ELEMEK A FELDOLGOZÁSHOZ
-const cardsSection = document.getElementById('cards');
-const navLinksEl = document.getElementById('navLinks');
-const authLink = document.getElementById('authLink');
-
-let activeCard = null;
-
-// --- BEJELENTKEZÉS KEZELÉSE ---
-// Ezt a sessionStorge-ot egy igazi backend rendszernél session cookie vagy token helyettesítené
-const isLoggedIn = sessionStorage.getItem('isLoggedIn') === 'true'; 
-
-function updateUIForAuth() {
-    if (isLoggedIn) {
-        // Bejelentkezve: Kártyák megjelenítése
-        cardsSection.classList.remove('hidden');
-
-        // Navigáció frissítése: Hozzáadjuk a Kártyák linket, és Kijelentkezésre cseréljük a gombot
-        // Ellenőrizzük, hogy a Kártyák link nincs-e már ott
-        if (!document.querySelector('#navLinks a[href="#cards"]')) {
-            const cardsLink = document.createElement('a');
-            cardsLink.href = '#cards';
-            cardsLink.textContent = 'Kártyák';
-            
-            // Hozzáadjuk a Rólunk link után, a bejelentkezési link elé
-            const aboutLink = document.querySelector('#navLinks a[href="#about"]');
-            if (aboutLink) {
-                navLinksEl.insertBefore(cardsLink, authLink);
-            } else {
-                 navLinksEl.insertBefore(cardsLink, authLink);
-            }
-        }
-        
-        authLink.textContent = 'Kijelentkezés';
-        authLink.href = '#';
-        // Eltávolítjuk a bejelentkezés oldali átirányítást (ha volt) és hozzáadjuk a kijelentkezést
-        authLink.removeEventListener('click', redirectToLogin); 
-        authLink.addEventListener('click', logout); 
-        
-        // Rendereljük a kártyákat
-        renderCards(cards);
-    } else {
-        // Nincs bejelentkezve: Kártyák elrejtése
-        cardsSection.classList.add('hidden');
-        
-        // Kártyák link eltávolítása (ha létezik)
-        const existingCardsLink = document.querySelector('#navLinks a[href="#cards"]');
-        if (existingCardsLink) {
-            existingCardsLink.remove();
-        }
-
-        // Visszaállítjuk a Bejelentkezés linket
-        authLink.textContent = 'Bejelentkezés';
-        authLink.href = 'login.html';
-        authLink.removeEventListener('click', logout); 
-    }
-}
-
-function redirectToLogin(e) {
-    // Ezt a funkciót csak azért kell, hogy ne ugorjon fel az 'undefined' hiba, 
-    // mivel az index.html már tartalmazza a login.html linket
-}
+function isLoggedIn() { return sessionStorage.getItem('isLoggedIn') === 'true'; }
 
 function logout(e) {
-    e.preventDefault();
-    sessionStorage.removeItem('isLoggedIn');
-    alert('Sikeresen kijelentkeztél. Visszairányítás a főoldalra.');
-    window.location.href = 'index.html'; // Oldal frissítése az állapotváltozás miatt
+  if (e) e.preventDefault();
+  sessionStorage.removeItem('isLoggedIn');
+  sessionStorage.removeItem('user');
+  window.location.href = 'index.html';
 }
 
-// Futás a DOM betöltése után
-document.addEventListener('DOMContentLoaded', updateUIForAuth);
-// -----------------------------
+document.addEventListener('DOMContentLoaded', function () {
+  cardsEl = document.getElementById('cardsGrid');
+  searchEl = document.getElementById('search');
+  modal = document.getElementById('tradeModal');
+  modalCardInfo = document.getElementById('modalCardInfo');
+  tradeForm = document.getElementById('tradeForm');
+  modalClose = document.getElementById('modalClose');
+  modalCancel = document.getElementById('modalCancel');
+  authLink = document.getElementById('authLink');
 
+  viewModal = document.getElementById('viewModal');
+  viewModalBody = document.getElementById('viewModalBody');
+  viewModalClose = document.getElementById('viewModalClose');
+  viewModalOk = document.getElementById('viewModalOk');
 
-// Scroll reveal animation
-const revealElements = document.querySelectorAll('.reveal');
-const revealOnScroll = () => {
-  revealElements.forEach(el => {
-    const rect = el.getBoundingClientRect();
-    const isVisible = rect.top < window.innerHeight - 100;
-    if (isVisible) el.classList.add('active');
+  // Menü kezelése bejelentkezés alapján
+  const navLinksContainer = document.querySelector('.nav-links');
+  if (isLoggedIn() && authLink && navLinksContainer) {
+    authLink.textContent = 'Kijelentkezés';
+    authLink.href = '#';
+    authLink.addEventListener('click', logout);
+
+    const currentLinks = Array.from(navLinksContainer.querySelectorAll('a'));
+    const hasCardsLink = currentLinks.some(link => link.getAttribute('href') === 'cards.html');
+
+    if (!hasCardsLink) {
+      const cardsLink = document.createElement('a');
+      cardsLink.href = 'cards.html';
+      cardsLink.textContent = 'Kártyák';
+      navLinksContainer.insertBefore(cardsLink, authLink);
+    }
+  }
+
+  // Megjelenési animációk (Scroll reveal)
+  const observerOptions = { threshold: 0.15 };
+  observer = new IntersectionObserver((entries) => {
+    // Collect elements that just became visible and are not already active
+    const visible = entries
+      .filter(e => e.isIntersecting && !e.target.classList.contains('active'))
+      // sort by vertical position so reveal happens top-to-bottom
+      .sort((a, b) => a.boundingClientRect.y - b.boundingClientRect.y);
+
+    if (visible.length === 0) return;
+
+    visible.forEach((entry, i) => {
+      // stagger delay per item (80ms step), cap at 800ms
+      const delay = Math.min(i * 80, 800);
+      setTimeout(() => {
+        entry.target.classList.add('active');
+        if (observer) observer.unobserve(entry.target);
+      }, delay);
+    });
+  }, observerOptions);
+
+  // Kártyák renderelése
+  if (cardsEl) renderCards(cards);
+  // Observe any existing reveal elements (including cards just rendered)
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  if (searchEl) {
+    searchEl.addEventListener('input', function () {
+      const q = this.value.trim().toLowerCase();
+      const filtered = cards.filter(c => (c.title + ' ' + c.series + ' ' + c.owner).toLowerCase().includes(q));
+      renderCards(filtered);
+    });
+  }
+
+  // Modal bezárók
+  const closeAllModals = () => {
+    if (viewModal) viewModal.setAttribute('aria-hidden', 'true');
+    if (modal) modal.setAttribute('aria-hidden', 'true');
+  };
+
+  if (viewModalClose) viewModalClose.addEventListener('click', closeAllModals);
+  if (viewModalOk) viewModalOk.addEventListener('click', closeAllModals);
+  if (modalClose) modalClose.addEventListener('click', closeAllModals);
+  if (modalCancel) modalCancel.addEventListener('click', closeAllModals);
+
+  window.addEventListener('click', (e) => {
+    if (e.target === viewModal || e.target === modal) closeAllModals();
   });
-};
-window.addEventListener('scroll', revealOnScroll);
-window.addEventListener('load', revealOnScroll);
 
+  document.addEventListener('keydown', (e) => {
+    if (e.key === "Escape") closeAllModals();
+  });
 
-function renderCards(list){
+  if (tradeForm) {
+    tradeForm.addEventListener('submit', function (evt) {
+      evt.preventDefault();
+      alert('Kérés elküldve!');
+      closeAllModals();
+    });
+  }
+});
+
+function renderCards(list) {
+  if (!cardsEl) return;
   cardsEl.innerHTML = '';
-  // Csak akkor renderelünk kártyákat, ha be van jelentkezve
-  if (!isLoggedIn) return; 
-  
-  list.forEach(c=>{
+  list.forEach((c) => {
     const el = document.createElement('article');
-    el.className = 'card';
+    el.className = 'card reveal';
+    el.style.cursor = 'pointer';
+    el.onclick = () => viewCard(c.id);
+
+    const thumbHtml = c.image
+      ? `<div class="thumb"><img src="${escapeHtml(c.image)}" alt="${escapeHtml(c.title)}"></div>`
+      : `<div class="thumb">${escapeHtml(c.title)}</div>`;
+
     el.innerHTML = `
-      <div class="thumb">${escapeHtml(c.title)}</div>
-      <h3>${escapeHtml(c.title)}</h3>
-      <div class="meta">${escapeHtml(c.series)} • Tulaj: ${escapeHtml(c.owner)}</div>
-      <div class="actions">
-        <button class="btn" onclick="viewCard(${c.id})">Megnéz</button>
-        <button class="btn primary" onclick="openTrade(${c.id})">Kérés küldése</button>
+      <div class="card-inner">
+        ${thumbHtml}
+        <h3>${escapeHtml(c.title)}</h3>
+        <div class="meta">${escapeHtml(c.series)}</div>
       </div>
     `;
     cardsEl.appendChild(el);
+    if (observer) observer.observe(el);
   });
 }
 
-function escapeHtml(s){return String(s).replace(/[&<>"']/g, function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m];});}
+window.viewCard = function (id) {
+  const c = cards.find(x => x.id === id);
+  if (!c || !viewModalBody) return;
+  activeCard = c;
 
-window.viewCard = function(id){
-  const c = cards.find(x=>x.id===id);
-  alert(`${c.title} — ${c.series} (Tulaj: ${c.owner})`);
-}
+  const imgHtml = c.image
+    ? `<div class="modal-view-img"><img src="${escapeHtml(c.image)}" alt="${escapeHtml(c.title)}"></div>`
+    : `<div class="modal-view-placeholder">Nincs kép elérhető</div>`;
 
-window.openTrade = function(id){
-  activeCard = cards.find(x=>x.id===id);
-  modalCardInfo.innerHTML = `<strong>${escapeHtml(activeCard.title)}</strong><div class="meta">${escapeHtml(activeCard.series)} • Tulaj: ${escapeHtml(activeCard.owner)}</div>`;
-  modal.setAttribute('aria-hidden','false');
-}
+  viewModalBody.innerHTML = `
+    <h2 data-text="${escapeHtml(c.title)}">${escapeHtml(c.title)}</h2>
+    ${imgHtml}
+    <div class="modal-view-details">
+      <p><strong>Sorozat:</strong> ${escapeHtml(c.series)}</p>
+      <p><strong>Tulajdonos:</strong> ${escapeHtml(c.owner)}</p>
+    </div>
+  `;
+  viewModal.setAttribute('aria-hidden', 'false');
+};
 
-function closeModal(){
-  modal.setAttribute('aria-hidden','true');
-  tradeForm.reset();
-}
+window.openTradeFromView = function () {
+  viewModal.setAttribute('aria-hidden', 'true');
+  modalCardInfo.innerHTML = `<strong>${escapeHtml(activeCard.title)}</strong><br><small>${escapeHtml(activeCard.series)}</small>`;
+  modal.setAttribute('aria-hidden', 'false');
+};
 
-tradeForm.addEventListener('submit', function(evt){
-  evt.preventDefault();
-  const yourCard = document.getElementById('yourCard').value.trim();
-  const message = document.getElementById('message').value.trim();
-  // Simulate sending: store locally in localStorage as demo
-  const requests = JSON.parse(localStorage.getItem('tradeRequests')||'[]')||[];
-  requests.push({to:activeCard.owner,card:activeCard.title,yourCard,message,when:new Date().toISOString()});
-  localStorage.setItem('tradeRequests',JSON.stringify(requests));
-  alert('Kérés elküldve (demo): a tulajdonos értesítése szimulálva.');
-  closeModal();
-});
-
-modalClose.addEventListener('click', closeModal);
-modalCancel.addEventListener('click', closeModal);
-
-searchEl.addEventListener('input', function(){
-  const q = this.value.trim().toLowerCase();
-  
-  // Csak akkor keressünk, ha be van jelentkezve 
-  if(!isLoggedIn) return;
-
-  if(!q) return renderCards(cards);
-  
-  const filtered = cards.filter(c=> (c.title+ ' '+c.series+' '+c.owner).toLowerCase().includes(q));
-  renderCards(filtered);
-});
+function escapeHtml(s) { return String(s).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": "&#39;" }[m])); }
