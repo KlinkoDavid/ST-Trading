@@ -1,13 +1,4 @@
-const cards = [
-  { id: 1, title: 'Eleven (Red Eyes)', series: 'Series A', owner: 'Zsófi', image: 'img/6pack.png' },
-  { id: 2, title: 'Demogorgon Foil', series: 'Series B', owner: 'Bence', image: null },
-  { id: 3, title: 'Hopper — Special', series: 'Series A', owner: 'Anna', image: null },
-  { id: 4, title: 'Will Byers (Glow)', series: 'Series C', owner: 'Máté', image: null },
-  { id: 5, title: 'Max — Skate', series: 'Series B', owner: 'Dóra', image: null },
-  { id: 6, title: 'Dustin — Cap', series: 'Series A', owner: 'Gergő', image: null },
-  { id: 7, title: 'Lucas — Slingshot', series: 'Series C', owner: 'Lilla', image: null },
-  { id: 8, title: 'Mike — Walkie Talkie', series: 'Series B', owner: 'Áron', image: null }
-];
+let cards = [];
 
 let cardsEl, searchEl, modal, modalCardInfo, tradeForm, modalClose, modalCancel, authLink, activeCard;
 let viewModal, viewModalBody, viewModalClose, viewModalOk;
@@ -53,6 +44,14 @@ document.addEventListener('DOMContentLoaded', function () {
       cardsLink.textContent = 'Kártyák';
       navLinksContainer.insertBefore(cardsLink, authLink);
     }
+      // Add profile link so logged-in users can open their profile page
+      const hasProfileLink = currentLinks.some(link => link.getAttribute('href') === 'profile.html');
+      if (!hasProfileLink) {
+        const profileLink = document.createElement('a');
+        profileLink.href = 'profile.html';
+        profileLink.textContent = 'Profil';
+        navLinksContainer.insertBefore(profileLink, authLink);
+      }
   }
 
   // Megjelenési animációk (Scroll reveal)
@@ -66,18 +65,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (visible.length === 0) return;
 
+    // Apply a per-item CSS delay (so animation uses the delay) and activate
     visible.forEach((entry, i) => {
-      // stagger delay per item (80ms step), cap at 800ms
       const delay = Math.min(i * 80, 800);
-      setTimeout(() => {
-        entry.target.classList.add('active');
-        if (observer) observer.unobserve(entry.target);
-      }, delay);
+      entry.target.style.setProperty('--reveal-delay', delay + 'ms');
+      entry.target.classList.add('active');
+      if (observer) observer.unobserve(entry.target);
     });
   }, observerOptions);
 
   // Kártyák renderelése
-  if (cardsEl) renderCards(cards);
+  if (cardsEl) fetchCards();
   // Observe any existing reveal elements (including cards just rendered)
   document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
@@ -117,29 +115,54 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 });
 
-function renderCards(list) {
-  if (!cardsEl) return;
+function renderCards(cardsToRender) {
   cardsEl.innerHTML = '';
-  list.forEach((c) => {
-    const el = document.createElement('article');
-    el.className = 'card reveal';
-    el.style.cursor = 'pointer';
-    el.onclick = () => viewCard(c.id);
+  cardsToRender.forEach(c => {
+    const card = document.createElement('div');
+    card.className = 'card reveal';
+    card.onclick = () => viewCard(c.id);
 
-    const thumbHtml = c.image
-      ? `<div class="thumb"><img src="${escapeHtml(c.image)}" alt="${escapeHtml(c.title)}"></div>`
-      : `<div class="thumb">${escapeHtml(c.title)}</div>`;
+    const thumbClass = c.image ? 'thumb has-image' : 'thumb';
+    const imgHtml = c.image ? `<img src="${c.image}" alt="${c.title}">` : '<span>Nincs kép</span>';
 
-    el.innerHTML = `
-      <div class="card-inner">
-        ${thumbHtml}
-        <h3>${escapeHtml(c.title)}</h3>
-        <div class="meta">${escapeHtml(c.series)}</div>
+    card.innerHTML = `
+      <div class="${thumbClass}">
+        ${imgHtml}
+      </div>
+      <h3>${c.title}</h3>
+      <div class="meta">
+        <span>${c.series}</span>
+        <span> • ${c.city || 'Ismeretlen'}</span>
       </div>
     `;
-    cardsEl.appendChild(el);
-    if (observer) observer.observe(el);
+    cardsEl.appendChild(card);
+    // Observe newly added card so the scroll-reveal logic can trigger it.
+    try { if (observer) observer.observe(card); } catch (e) { /* noop */ }
   });
+}
+
+async function fetchCards() {
+  try {
+    const res = await fetch('php/get_cards.php');
+    if (!res.ok) throw new Error('Network');
+    const data = await res.json();
+    if (Array.isArray(data) && data.length > 0) {
+      cards = data.map(d => ({
+        id: d.id,
+        title: d.title,
+        series: d.series,
+        owner: d.owner || d.username || '—',
+        city: d.city || '—',
+        image: d.image || null
+      }));
+    } else {
+      // fallback to static
+      cards = staticCards;
+    }
+  } catch (e) {
+    cards = staticCards;
+  }
+  renderCards(cards);
 }
 
 window.viewCard = function (id) {
@@ -155,8 +178,9 @@ window.viewCard = function (id) {
     <h2 data-text="${escapeHtml(c.title)}">${escapeHtml(c.title)}</h2>
     ${imgHtml}
     <div class="modal-view-details">
-      <p><strong>Sorozat:</strong> ${escapeHtml(c.series)}</p>
+      <p><strong>Tipus:</strong> ${escapeHtml(c.series)}</p>
       <p><strong>Tulajdonos:</strong> ${escapeHtml(c.owner)}</p>
+      <p><strong>Város:</strong> ${escapeHtml(c.city)}</p>
     </div>
   `;
   viewModal.setAttribute('aria-hidden', 'false');

@@ -1,0 +1,154 @@
+
+.upload-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 350px;
+    gap: 40px;
+    margin-top: 40px;
+    align-items: start;
+}
+
+.upload-card-box {
+    background: rgba(10, 10, 15, 0.9);
+    border: 1px solid rgba(229, 9, 20, 0.4);
+    padding: 35px;
+    border-radius: 20px;
+    box-shadow: 0 0 30px rgba(229, 9, 20, 0.1);
+}
+
+.input-group {
+    margin-bottom: 25px;
+}
+
+.input-group label {
+    display: block;
+    color: var(--accent-2); /* Világosabb vöröses szín */
+    margin-bottom: 10px;
+    font-size: 12px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+/* INPUT ÉS SELECT STÍLUS */
+.input-group input, 
+.input-group select {
+    width: 100%;
+    padding: 15px;
+    background: #14141a; /* Fix sötét háttér a láthatóságért */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: #fff;
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    appearance: none; /* Alap böngésző stílus eltávolítása */
+}
+
+/* Ez javítja ki a fehér a fehéren hibát */
+.input-group select option {
+    background-color: #1a1a24;
+    color: #fff;
+    padding: 10px;
+}
+
+.input-group input:focus, 
+.input-group select:focus {
+    border-color: var(--accent);
+    outline: none;
+    box-shadow: 0 0 15px rgba(229, 9, 20, 0.4);
+}
+
+/* EGYEDI FÁJL FELTÖLTŐ */
+.file-upload-wrapper {
+    position: relative;
+}
+
+.btn.primary {
+    font-weight: 100;
+}
+
+.file-upload-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    background: rgba(229, 9, 20, 0.03);
+    border: 2px dashed rgba(229, 9, 20, 0.3);
+    padding: 30px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: 0.3s;
+    color: var(--muted);
+}
+
+.file-upload-label:hover {
+    background: rgba(229, 9, 20, 0.08);
+    border-color: var(--accent);
+    color: #fff;
+}
+
+.file-upload-label {
+    min-height: 75px; /* Megfelelő magasság */
+    display: flex;
+    flex-direction: column;
+    align-items: center;      /* Vízszintes középpont */
+    justify-content: center;   /* Függőleges középpont */
+    text-align: center;
+    background: rgba(229, 9, 20, 0.03);
+    border: 2px dashed rgba(229, 9, 20, 0.3);
+    padding: 10px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: 0.3s;
+    color: var(--muted);
+}   
+
+#cardImage {
+    display: none;
+}
+.preview-container {
+    top: 100px;
+    text-align: center;
+}
+
+/* Make preview card match cards grid min width so it appears the same size */
+.preview-container .card{
+    width: 100%;       /* adapt to the preview column */
+    max-width: 300px;  /* don't grow beyond this to match cards' visual size */
+    margin: 0 auto;
+}
+
+@media (max-width: 600px) {
+    .preview-container .card { width: 100%; max-width: none; }
+}
+
+.previewTitle {
+    font-weight: 100;
+
+}
+
+
+.preview-label {
+    color: var(--accent);
+    font-family: 'Alfa Slab One', cursive;
+    font-size: 26px;
+    margin-bottom: 20px;
+    letter-spacing: 2px;
+}
+
+/* ELŐNÉZET BETŰTIPUSOK */
+#previewTitle {
+    font-family: 'Alfa Slab One', cursive !important;
+    color: #fff;
+    letter-spacing: 1px;
+}
+
+#previewType, #previewCity {
+    font-family: 'Inter', sans-serif !important;
+    font-weight: 400;
+}
+
+@media (max-width: 850px) {
+    .upload-wrapper { grid-template-columns: 1fr; }
+    .preview-container { order: -1; margin-bottom: 30px; }
+}

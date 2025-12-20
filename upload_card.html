@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="hu">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Stranger Trading — Kártya beküldése</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Creepster&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/cards.css">
+  <link rel="stylesheet" href="css/upload.css">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-content">
+      <div class="logo">
+        <span class="logo-text">STRANGER</span>
+        <small class="logo-sub">Trading</small>
+      </div>
+      <div class="nav-links">
+        <a href="index.html">Főoldal</a>
+        <a href="cards.html">Kártyák</a>
+        <a href="login.html" id="authLink">Bejelentkezés</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container" style="padding:140px 20px 60px;">
+    <h1 class="section-title" data-text="Új kártya">Új kártya</h1>
+    
+    <div class="upload-wrapper">
+      
+      <div class="upload-card-box">
+        <form id="uploadForm">
+          <div class="input-group">
+            <label for="title">Kártya neve / száma</label>
+            <input type="text" id="title" placeholder="Pl. Dustin Henderson" required>
+          </div>
+
+          <div class="input-group">
+            <label for="type">Ritkaság (Típus)</label>
+            <select id="type" required>
+                <option value="" disabled selected>Válassz ritkaságot...</option>
+                <option value="Sima"> Sima</option>
+                <option value="Ezüst"> Ezüst</option>
+                <option value="Arany"> Arany</option>
+                <option value="Holo"> Holo</option>
+                <option value="Limited"> Limited</option>
+            </select>
+          </div>
+
+          <div class="input-group">
+            <label for="city">Helyszín / Város</label>
+            <input type="text" id="city" placeholder="Pl. Budapest" required>
+          </div>
+
+          <div class="input-group">
+            <label>Kártya grafikája</label>
+            <div class="file-upload-wrapper">
+                <label for="cardImage" class="file-upload-label" id="fileLabel">
+                    <span style="font-size: 30px;">📸</span>
+                    <span id="fileText">Kattints a kép kiválasztásához</span>
+                    <small style="opacity: 0.5;">JPG, PNG vagy WEBP (max. 3MB)</small>
+                </label>
+                <input type="file" id="cardImage" accept="image/*" required>
+            </div>
+          </div>
+
+          <button type="submit" class="btn primary" style="width:100%; margin-top:10px; padding:20px; font-family: 'Alfa Slab One', cursive; font-size: 18px;">
+            KÁRTYA LÉTREHOZÁSA
+          </button>
+          <p id="status" style="margin-top:20px; text-align:center;"></p>
+        </form>
+      </div>
+
+      <div class="preview-container">
+        <div class="preview-label">KÁRTYA ELŐNÉZET</div>
+        
+        <div class="cards-grid" style="display:block;">
+            <div class="card" style="margin: 0 auto; pointer-events: none;">
+                <div id="previewThumb" class="thumb">
+                    <div style="height:100%; display:flex; align-items:center; justify-content:center; color:rgba(255,255,255,0.05); font-size:60px;">
+                        ?
+                    </div>
+                </div>
+                <div class="card-info">
+                    <h3 id="previewTitle">Kártya neve</h3>
+                    <div class="meta">
+                        <span id="previewType">Ritkaság</span> • <span id="previewCity">Város</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    const username = sessionStorage.getItem('user');
+    if (!username) window.location.href = 'login.html';
+
+    const fileInput = document.getElementById('cardImage');
+    const fileText = document.getElementById('fileText');
+    const fileLabel = document.getElementById('fileLabel');
+
+    // Live Preview Logic
+    const pTitle = document.getElementById('previewTitle');
+    const pType = document.getElementById('previewType');
+    const pCity = document.getElementById('previewCity');
+    const pThumb = document.getElementById('previewThumb');
+
+    const updateFields = () => {
+        pTitle.textContent = document.getElementById('title').value || "Kártya neve";
+        pType.textContent = document.getElementById('type').value || "Ritkaság";
+        pCity.textContent = document.getElementById('city').value || "Város";
+    };
+
+    ['title', 'type', 'city'].forEach(id => {
+        document.getElementById(id).addEventListener('input', updateFields);
+    });
+
+    fileInput.addEventListener('change', function() {
+        const file = this.files[0];
+        if (file) {
+            fileText.textContent = "Kiválasztva: " + file.name;
+            fileLabel.style.borderColor = "var(--accent)";
+            fileLabel.style.color = "#fff";
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              // Use the same inner frame markup as cards so preview matches final look
+              pThumb.innerHTML = `<div class="thumb-frame"><img src="${e.target.result}" alt="preview"></div>`;
+              pThumb.classList.add('has-image');
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Form submission code remains the same...
+    document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const status = document.getElementById('status');
+        status.textContent = "Feltöltés...";
+        
+        const fd = new FormData();
+        fd.append('title', document.getElementById('title').value);
+        fd.append('type', document.getElementById('type').value);
+        fd.append('city', document.getElementById('city').value);
+        fd.append('username', username);
+        if (fileInput.files[0]) fd.append('image', fileInput.files[0]);
+
+        try {
+            const res = await fetch('php/upload_card.php', { method: 'POST', body: fd });
+            const data = await res.json();
+            if (data.success) {
+                status.style.color = "#4caf50";
+                status.textContent = "Sikeres feltöltés!";
+                setTimeout(() => window.location.href = 'cards.html', 1000);
+            } else {
+                status.style.color = "var(--accent)";
+                status.textContent = data.message;
+            }
+        } catch (err) {
+            status.textContent = "Hiba történt.";
+        }
+    });
+  </script>
+</body>
+</html>

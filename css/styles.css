@@ -1094,8 +1094,3 @@ body::after {
 .hidden {
   display: none !important;
 }
-
-/* Card entrance reveal (used when cards are rendered) */
-.card.reveal {
-  /* moved to css/cards.css */
-}
